@@ -9,8 +9,13 @@ MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
+if(APPLE)
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -mcpu=apple-m1")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mcpu=apple-m1")
+else()
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+endif()
 
 # Check C++11 or C++0x support
 include(CheckCXXCompilerFlag)
@@ -38,6 +43,9 @@ find_package(OpenCV 4)
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 
+# MESSAGE("${Eigen3_VERSION}")
+# MESSAGE("${EIGEN3_INCLUDE_DIR}")
+# INCLUDE_DIRECTORIES ( "${EIGEN3_INCLUDE_DIR}" )
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(realsense2)
@@ -115,14 +123,33 @@ include/Settings.h)
 
 add_subdirectory(Thirdparty/g2o)
 
+# set(boost /opt/homebrew/opt/boost)
+find_package(Boost COMPONENTS serialization)
+message("Boost version is ${Boost_VERSION}")
+# message("${Pangolin_DIRS}")
+# find_package(boost)
+# if(boost_FOUND)
+#    message(boost_status)
+# endif()
+
+# include_directories(/opt/homebrew/opt/openssl/include)
+# include_directories(/opt/homebrew/opt/glew/include)
+# set (OPENSSL_ROOT_DIR /opt/homebrew/opt/openssl)
+# set (OPENSSL_LIBRARIES /opt/homebrew/opt/openssl/lib)
+find_package(Openssl REQUIRED)
+message("${Openssl_VERSION}")
+
+
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
--lboost_serialization
--lcrypto
+${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.dylib
+${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.dylib
+${Boost_LIBRARIES}
+# -lboost_serialization
+${Crypto_LIBRARIES}
+# -lcrypto
 )
 
 # If RealSense SDK is found the library is added and its examples compiled
