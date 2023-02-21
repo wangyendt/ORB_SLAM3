@@ -131,6 +131,8 @@ int main(int argc, char *argv[])
         cv::Mat im;
         vector<ORB_SLAM3::IMU::Point> vImuMeas;
         proccIm = 0;
+        float sum_dist = 0.0f;
+        float last_pos[3] = {0.0f,0.0f,0.0f};
         for(int ni=0; ni<nImages[seq]; ni++, proccIm++)
         {
             // Read image from file
@@ -192,7 +194,18 @@ int main(int argc, char *argv[])
 
             // Pass the image to the SLAM system
             // cout << "tframe = " << tframe << endl;
-            SLAM.TrackMonocular(im,tframe,vImuMeas); // TODO change to monocular_inertial
+
+            auto pose = SLAM.TrackMonocular(im,tframe,vImuMeas); // TODO change to monocular_inertial
+            // auto trans = pose.translation().data();
+            // auto rot = pose.rotationMatrix().data();
+            // sum_dist += sqrt((trans[0]-last_pos[0])*(trans[0]-last_pos[0]) + (trans[1]-last_pos[1])*(trans[1]-last_pos[1]));
+            // std::cout << setprecision(4) << "pose: ";
+            // for (auto i = 0; i < 3; ++i){
+            //     last_pos[i] = trans[i];
+            //     std::cout << trans[i] << ",";
+            // }
+            // std::cout << sum_dist;
+            // std::cout << std::endl;
 
     #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
